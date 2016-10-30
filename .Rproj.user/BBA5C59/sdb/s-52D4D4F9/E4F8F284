@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n# This is the server logic for a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n\n\n\n\nshinyServer <- function(input, output) {\n  \n  ## Career Choices \n  careersAvailable = c(\"Art\",\n                       \"Writing\",\n                       \"Social\",\n                       \"Govt\",\n                       \"Law\",\n                       \"Sales\",\n                       \"Consulting\",\n                       \"Finance\",\n                       \"Insurance\",\n                       \"K-12 Ed\",\n                       \"College Ed\",\n                       \"Health\",\n                       \"Eng\",\n                       \"Tech\",\n                       \"Other\"\n  )\n  \n  ##Major Choices\n  majorsAvailable = c(\"Art\",\n                      \"Langs\",\n                      \"Eng Lit\" ,\n                      \"Phil\",\n                      \"Cult Stud\",\n                      \"Hist\",\n                      \"PoliSci\",\n                      \"Econo\",\n                      \"Psych\",\n                      \"Geos\",\n                      \"Bio\",\n                      \"Chem\", \n                      \"Phys\",\n                      \"CS\",\n                      \"Math\"\n  )\n  \n  grid.color = c(\"Art\" = \"#003366\" ,\n                 \"Langs\" = \"#336699\",\n                 \"Eng Lit\" = \"#0099cc\",\n                 \"Phil\" = \"#00ccff\",\n                 \"Cult Stud\" = \"#00ffff\",\n                 \"Hist\" = \"#00ffcc\",\n                 \"PoliSci\"= \"#009999\",\n                 \"Econo\" = \"#006699\",\n                 \"Psych\" = \"#0066ff\",\n                 \"Geos\" = \"#3366ff\",\n                 \"Bio\" = \"#333399\",\n                 \"Chem\" = \"#000066\", \n                 \"Phys\" = \"#6666ff\",\n                 \"CS\" = \"#6600cc\",\n                 \"Math\" = \"#6699ff\", \n                 \"Writing\" = \"#003366\", \n                 \"Social\" = \"#336699\",\n                 \"Govt\" = \"#0099cc\",\n                 \"Law\" = \"#00ccff\",\n                 \"Sales\" = \"#00ffff\",\n                 \"Consulting\" = \"#00ffcc\",\n                 \"Finance\" = \"#009999\",\n                 \"Insurance\" = \"#006699\",\n                 \"K-12 Ed\" =  \"#0066ff\",\n                 \"College Ed\" = \"#0066ff\",\n                 \"Health\" = \"#3366ff\",\n                 \"Eng\" = \"#333399\",\n                 \"Tech\" = \"#000066\", \n                 \"Other\"  = \"#6600cc\")\n  \n  generateFromToDf <- function() { \n    from = sample(majorsAvailable, 25, replace = T)\n    to = sample(careersAvailable, 25, replace = T)\n    value = sample(c(1,2,3), size = 25, replace = T)\n    df <- data.frame(\"from\" = from, \"to\" = to, \"value\" = value)\n  }\n  \n\n\n  output$sankey <- renderPlot({\n    df <- generateFromToDf()\n    chordDiagram(df, grid.col = grid.color, transparency = 0)\n  })\n\n}\n\n",
+    "created" : 1477792558276.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3874630746",
+    "id" : "E4F8F284",
+    "lastKnownWriteTime" : 1477803275,
+    "last_content_update" : 1477803275924,
+    "path" : "~/KT/M33DevdossVis/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(shinydashboard)\nlibrary(leaflet)\n\nheader <- dashboardHeader(\n  title = \"Williams College\"\n)\n\nbody <- dashboardBody(\n  fluidRow(\n    column(width = 8,\n           box(width = NULL, title = strong(\"Career Path for 15600 Williams College Alums\"),\n               plotOutput(\"sankey\")\n           ),\n           box(width = NULL, solidHeader = TRUE,\n               sliderInput(inputId = \"timeline\", label = \"Timeline\", \n                           min = 1960, max = 2016, value = 2010, step = 5),\n               p(\n                 class = \"text-muted\",\n                 paste(\"Five year intervals are grouped together.\")\n               )\n           )\n    ),\n    column(width = 4,\n           box(width = NULL, status = \"warning\", title = strong(\"Major\"), \n               p(class = \"text-muted\",\n                 \"Subset by Major\"\n               ),\n               checkboxGroupInput(\"major\", \"Show\",\n                                  choices = c(\n                                    \"Art/Music\" = 1,\n                                    \"Languages\" = 2,\n                                    \"English Literature\" = 3,\n                                    \"Philosphy/Religion\" = 4,\n                                    \"Culture Studies\" = 5,\n                                    \"History\" = 6,\n                                    \"Political Science\" = 7,\n                                    \"Economics\" = 8,\n                                    \"Psychology\" = 9,\n                                    \"Geosciences\" = 10, \n                                    \"Biology\" = 11,\n                                    \"Chemistry\" = 12, \n                                    \"Physics/Astrology\" = 13,\n                                    \"Computer Science\" = 14,\n                                    \"Math\" = 15\n                                  ),\n                                  selected = 1:15\n               )\n           ),\n               \n           box(width = NULL, status = \"warning\", title = strong(\"Career\"), \n               p(class = \"text-muted\",\n                 \"Subset by Career\"\n               ),\n               checkboxGroupInput(\"career\", \"Show\",\n                                  choices = c(\n                                    \"Art/Entertainment\" = 1,\n                                    \"Writing/Communication\" = 2,\n                                    \"Social/Religious Services\" = 3,\n                                    \"Government\" = 4,\n                                    \"Law\" = 5,\n                                    \"Sales\" = 6,\n                                    \"Consulting\" = 7,\n                                    \"Banking/Finance\" = 8,\n                                    \"Insurance/Management\" = 9,\n                                    \"K-12 Education\" = 10, \n                                    \"College Education\" = 11,\n                                    \"Health/Medicine\" = 12, \n                                    \"Engineering/Construction\" = 13,\n                                    \"Technology\" = 14,\n                                    \"Math\" = 15\n                                  ),\n                                  selected = 1:15\n               )\n           )\n           \n    )\n  )\n)\n\ndashboardPage(\n  header,\n  dashboardSidebar(disable = TRUE),\n  body\n)",
+    "created" : 1477792557487.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1797488861",
+    "id" : "BC36AC6F",
+    "lastKnownWriteTime" : 1477798586,
+    "last_content_update" : 1477798586579,
+    "path" : "~/KT/M33DevdossVis/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
