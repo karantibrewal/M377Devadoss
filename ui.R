@@ -9,6 +9,10 @@ body <- dashboardBody(
   fluidRow(
     column(width = 8,
            box(width = NULL, title = strong("Career Path for 15600 Williams College Alums"),
+               p(
+                 paste("Each of the 15600 alums has an arc going from the left side of the circle to the right. Those with double majors have two arcs on the left (one from each of their majors, each arc with half thickness) that combine into one resulting career choice. Mouseover the labels on the image below to highlight that particular major or career compilation. 
+                       Click the image on the right to select the Compilation graphic.")
+               ),
                plotOutput("sankey")
            ),
            box(width = NULL, solidHeader = TRUE,
@@ -44,7 +48,8 @@ body <- dashboardBody(
                                     "Math" = 15
                                   ),
                                   selected = 1:15
-               )
+               ),
+               actionButton("visualize", "Visualize")
            ),
                
            box(width = NULL, status = "warning", title = strong("Career"), 
@@ -70,7 +75,8 @@ body <- dashboardBody(
                                     "Math" = 15
                                   ),
                                   selected = 1:15
-               )
+               ),
+               actionButton("visualize", "Visualize")
            )
            
     )

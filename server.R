@@ -38,7 +38,7 @@ shinyServer <- function(input, output) {
                       "Cult Stud",
                       "Hist",
                       "PoliSci",
-                      "Econo",
+                      "Econ",
                       "Psych",
                       "Geos",
                       "Bio",
@@ -78,17 +78,24 @@ shinyServer <- function(input, output) {
                  "Tech" = "#000066", 
                  "Other"  = "#6600cc")
   
-  generateFromToDf <- function() { 
-    from = sample(majorsAvailable, 25, replace = T)
-    to = sample(careersAvailable, 25, replace = T)
+  generateFromToDf <- function(majors, careers) { 
+    from = sample(majors, 25, replace = T)
+    to = sample(careers, 25, replace = T)
     value = sample(c(1,2,3), size = 25, replace = T)
     df <- data.frame("from" = from, "to" = to, "value" = value)
   }
   
-
+  observeEvent(input$visualize, {
+     majors <- majorsAvailable[as.numeric(input$major)]
+     careers <- careersAvailable[as.numeric(input$career)]
+    output$sankey <- renderPlot({
+      df <- generateFromToDf(majors, careers)
+      chordDiagram(df, grid.col = grid.color, transparency = 0)
+    })
+  })
 
   output$sankey <- renderPlot({
-    df <- generateFromToDf()
+    df <- generateFromToDf(majorsAvailable, careersAvailable)
     chordDiagram(df, grid.col = grid.color, transparency = 0)
   })
 
