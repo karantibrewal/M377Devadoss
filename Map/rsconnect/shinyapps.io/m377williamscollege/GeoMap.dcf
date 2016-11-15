@@ -2,8 +2,8 @@ name: GeoMap
 account: m377williamscollege
 server: shinyapps.io
 appId: 137174
-bundleId: 612497
+bundleId: 614867
 url: https://m377williamscollege.shinyapps.io/GeoMap/
-when: 1478927723.01659
+when: 1479188835.73889
 asMultiple: FALSE
 asStatic: FALSE

@@ -7,6 +7,8 @@
 #    http://shiny.rstudio.com/
 #
 
+
+lastPlotMap <- data.frame()
 generateDF <- function(industry, colors){
   Col <- c()
   for(i in 1:length(industry)){
@@ -40,7 +42,14 @@ generateDF <- function(industry, colors){
 }
 
 industry <- c("Finance", "Tech", "Social Work", "Education", "Consultancy")
-colors <- c("darkmagenta", "green", "deepskyblue", "firebrick", "yellow")
+colors <- c()
+colors["Finance"] <- "darkmagenta"
+colors["Tech"] <- "green"
+colors["Social Work"] <- "deepskyblue"
+colors["Education"] <- "firebrick"
+colors["Consultancy"] <- "yellow"
+
+
 
 
 library("leaflet")
@@ -55,6 +64,7 @@ ui <- shinyUI(fluidPage(
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
       sidebarPanel(
+        box(width = NULL, 
         checkboxGroupInput("Industry", "Show",
                            choices = c(
                              "Finance" = 1,
@@ -64,9 +74,15 @@ ui <- shinyUI(fluidPage(
                              "Consultancy" = 5
                            ),
                            selected = 1:5
-        ),
+          ),
         actionButton("visualize", "Visualize")
+        ),
+        box(width = NULL, height = 30),
+        box(width = NULL, 
+            plotOutput("biggestEmployers"))
+        
       ),
+   
       
       # Show a plot of the generated distribution
       mainPanel(
@@ -77,14 +93,23 @@ ui <- shinyUI(fluidPage(
                     to subset.")
               ),
             leafletOutput("mymap")
-            )
+            ),
+        box(width = NULL,
+            plotOutput("bar", click = "bar_click", hover = "bar_hover")
+        ),
+        box(width = NULL,
+            plotOutput("bar2", click = "bar2_click", hover = "bar2_hover")
+        )
       )
    )
 ))
+
 DF <- generateDF(industry, colors)
+lastSubset <- DF
+oldClick_X <- 0
+oldClick_Y <- 0
 # Define server logic required to draw a histogram
 server <- shinyServer(function(input, output) {
-   
    output$mymap <- renderLeaflet({
      leaflet(DF) %>% addTiles() %>%
      addCircles(lng = ~Long, lat = ~Lat, weight = 1,
@@ -95,25 +120,117 @@ server <- shinyServer(function(input, output) {
                 
      
    })
+   
+   output$biggestEmployers <- renderPlot({
+     name <- LETTERS[1:10]
+     freqs <- runif(10, 0, 100)
+     thisDf <- data.frame(name = name, freq = freqs)
+     ggplot(thisDf, aes(x = name, y = freq)) +
+       geom_bar(stat = "identity", fill = "blue", width = 0.75) +
+       coord_flip() + labs(title = "Biggest Employers") + xlab("Name") + 
+       theme(plot.title = element_text(size=22))
+     
+       
+   })
+   
+  
+   output$bar <- renderPlot({
+     frequency <- summarise(group_by(DF, Indus), sum(Freq))[2]
+     frequency <- c(frequency)[["sum(Freq)"]]
+     indus <- ordered(industry)
+     indus <- ordered(indus, levels = industry)
+     thisDf <- data.frame(freq = frequency, indus = indus)
+     isBarGeo <- F
+     ggplot(thisDf, aes(x = indus, y = freq)) + 
+       geom_bar(stat = "identity", fill = colors, width = 0.75) +
+       xlab("Industry") + ylab("") + labs(title = "Distribution of Ephs in Industry") +
+       theme(plot.title = element_text(size=22))
+     
+   })
+   
+
+   
    observeEvent(input$visualize, {
      indus <- industry[as.numeric(input$Industry)]
-     print(as.numeric(input$Industry))
      col <- colors[as.numeric(input$Industry)]
      df <- generateDF(indus, col)
-     print(df)
+     lastSubset <- df
      output$mymap <- renderLeaflet({
        leaflet(df) %>% addTiles() %>%
          addCircles(lng = ~Long, lat = ~Lat, weight = 1,
-                    radius = ~Freq * 10000, color = col, popup = ~Popup) %>%
+                    radius = ~Freq * 10000, color = ~Col, popup = ~Popup) %>%
          addLegend("bottomright", colors = col, labels = indus, opacity = 1,
                    title = "Industry")
-       
+     })
+     output$bar <- renderPlot({
+       frequency <- summarise(group_by(df, Indus), sum(Freq))[2]
+       frequency <- c(frequency)[["sum(Freq)"]]
+       indus_ <- ordered(indus)
+       indus_ <- ordered(indus_, levels = indus)
+       thisDf <- data.frame(freq = frequency, indus = indus_)
+       ggplot(thisDf, aes(x = indus, y = freq)) + 
+         geom_bar(stat = "identity", fill = colors[indus[1:length(indus)]], width = 0.75) +
+         xlab("Industry") + ylab("") + labs(title = "Distribution of Ephs in Industry") +
+         theme(plot.title = element_text(size=22))
+     })
+     
+     output$biggestEmployers <- renderPlot({
+       name <- LETTERS[1:10]
+       freqs <- runif(10, 0, 100)
+       thisDf <- data.frame(name = name, freq = freqs)
+       ggplot(thisDf, aes(x = name, y = freq)) +
+         geom_bar(stat = "identity", fill = "blue", width = 0.75) +
+         coord_flip() + labs(title = "Biggest Employers") + xlab("Name") + 
+         theme(plot.title = element_text(size=22))
        
        
      })
    })
    
+
+  
    
+   observeEvent(input$bar_click, {
+
+         indus <- industry[as.numeric(input$Industry)]
+         thisIndus <- indus[round(input$bar_click$x)]
+         thisDf <- filter(lastSubset, Indus == thisIndus)
+         output$bar2 <- renderPlot({
+         ggplot(thisDf, aes(x = Cities, y = Freq)) + 
+           geom_bar(stat = "identity", fill = colors[thisIndus], width = 0.75) + 
+             xlab("Industry") + ylab("") + 
+             labs(title = paste0("Geographical Distribution of Ephs in ", thisIndus)) +
+             theme(plot.title = element_text(size=22))
+         })
+         
+         df <- lastSubset
+         output$bar <- renderPlot({
+           df <- filter(df, Indus %in% indus)
+           frequency <- summarise(group_by(df, Indus), sum(Freq))[2]
+           frequency <- c(frequency)[["sum(Freq)"]]
+           indus_ <- ordered(indus)
+           indus_ <- ordered(indus_, levels = indus)
+           thisDf <- data.frame(freq = frequency, indus = indus_)
+           newCol <- rep("black", length(colors))
+           newCol[which(names(colors) == thisIndus)] <- colors[thisIndus]
+           ggplot(thisDf, aes(x = indus, y = freq)) + 
+             geom_bar(stat = "identity", fill = newCol, width = 0.75) +
+             xlab("Industry") + ylab("") + labs(title = "Distribution of Ephs in Industry") +
+             theme(plot.title = element_text(size=22))
+         })
+     
+         output$mymap <- renderLeaflet({
+           leaflet(thisDf) %>% addTiles() %>%
+             addCircles(lng = ~Long, lat = ~Lat, weight = 1,
+                        radius = ~Freq * 10000, color = ~Col, popup = ~Popup) %>%
+             addLegend("bottomright", colors = colors[thisIndus], labels = thisIndus, opacity = 1,
+                       title = "Industry")
+         })
+         
+         
+     }) 
+   
+
    
   
 })
